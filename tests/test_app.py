@@ -1,21 +1,21 @@
 import unittest
-from app.models import insert_book, get_books
+from app.models import insert_book, get_books, update_book, delete_book
 from app.db import get_db_connection
 
 class TestApp(unittest.TestCase):
 
     def setUp(self):
-        """Configura el entorno antes de cada prueba"""
+        """Sets up the environment before each test."""
         self.conn = get_db_connection()
         if self.conn:
-            print("Conexión a la base de datos establecida correctamente")
+            print("Database connection successfully established.")
         else:
-            self.fail("No se pudo conectar a la base de datos")
+            self.fail("Failed to connect to the database.")
 
     def test_insert_book(self):
-        """Prueba la inserción de un libro en la base de datos"""
+        """Tests inserting a book into the database."""
         book = {
-            '_version_': '8.0',
+            '_version_': '1.0',
             'title': 'Test Book',
             'author_name': 'Test Author',
             'first_publish_year': 2020,
@@ -26,27 +26,87 @@ class TestApp(unittest.TestCase):
         
         insert_book(book)
         
-        # Verificamos que el libro se haya insertado correctamente
+        # Verify the book was inserted correctly
         books = get_books()
         inserted_book = next((b for b in books if b[1] == 'Test Book'), None)
         
-        self.assertIsNotNone(inserted_book, "El libro no fue insertado correctamente")
-        self.assertEqual(inserted_book[1], 'Test Book', "El título del libro no coincide")
+        self.assertIsNotNone(inserted_book, "The book was not inserted correctly.")
+        self.assertEqual(inserted_book[1], 'Test Book', "The book title does not match.")
 
     def test_get_books(self):
-        """Prueba la obtención de todos los libros desde la base de datos"""
+        """Tests retrieving all books from the database."""
+        # Insert a book to ensure the database is not empty
+        book = {
+            '_version_': '2.0',
+            'title': 'Another Test Book',
+            'author_name': 'Another Test Author',
+            'first_publish_year': 2021,
+            'publisher': 'Another Test Publisher',
+            'subject': 'Another Test Subject',
+            'stock': 5
+        }
+        insert_book(book)
+
+        # Fetch all books
         books = get_books()
-        print(books)
-        self.assertIsInstance(books, list, "La respuesta no es una lista de libros")
-        self.assertGreater(len(books), 0, "No se encontraron libros en la base de datos")
+        print(books)  # Debugging purposes
+        self.assertIsInstance(books, list, "The response is not a list of books.")
+        self.assertGreater(len(books), 0, "No books were found in the database.")
+
+    def test_update_book(self):
+        """Tests updating a book in the database."""
+        # Insert a book to update
+        book = {
+            '_version_': '3.0',
+            'title': 'Book to Update',
+            'author_name': 'Author to Update',
+            'first_publish_year': 2019,
+            'publisher': 'Publisher to Update',
+            'subject': 'Subject to Update',
+            'stock': 7
+        }
+        insert_book(book)
+
+        # Update the book
+        updated_fields = {'title': 'Updated Book Title', 'stock': 15}
+        update_book('3.0', updated_fields)
+
+        # Verify the update
+        books = get_books()
+        updated_book = next((b for b in books if b[0] == '3.0'), None)
+        self.assertIsNotNone(updated_book, "The book to update was not found.")
+        self.assertEqual(updated_book[1], 'Updated Book Title', "The book title was not updated correctly.")
+        self.assertEqual(updated_book[6], 15, "The stock was not updated correctly.")
+
+    def test_delete_book(self):
+        """Tests deleting a book from the database."""
+        # Insert a book to delete
+        book = {
+            '_version_': '4.0',
+            'title': 'Book to Delete',
+            'author_name': 'Author to Delete',
+            'first_publish_year': 2018,
+            'publisher': 'Publisher to Delete',
+            'subject': 'Subject to Delete',
+            'stock': 12
+        }
+        insert_book(book)
+
+        # Delete the book
+        delete_book('4.0')
+
+        # Verify the deletion
+        books = get_books()
+        deleted_book = next((b for b in books if b[0] == '4.0'), None)
+        self.assertIsNone(deleted_book, "The book was not deleted correctly.")
 
     def tearDown(self):
-        """Limpia después de cada prueba"""
+        """Cleans up after each test."""
         if self.conn:
-            # Elimina el libro insertado en cada prueba
+            # Clean up test data by deleting specific test books
             cursor = self.conn.cursor()
-            cursor.execute("DELETE FROM books WHERE _version_ = %s;", ('8.0',))  # Borra el libro por versión
-            self.conn.commit()  # Confirma la eliminación
+            cursor.execute("DELETE FROM books WHERE _version_ IN (%s, %s, %s, %s);", ('1.0', '2.0', '3.0', '4.0'))
+            self.conn.commit()
             cursor.close()
             self.conn.close()
 
