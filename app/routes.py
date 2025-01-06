@@ -52,8 +52,12 @@ def add_book_route():
     if '_version_' not in book:
         return jsonify({"error": "_version_ is required"}), 400  # Validation for _version_
     
+    # Insert the book into the database
     insert_book(book)
-    return jsonify({"message": "Book added successfully!"}), 201
+    
+    # Devuelve el libro insertado, puedes incluir más detalles si lo necesitas
+    return jsonify(book), 201
+
 
 @app.route('/books', methods=['PUT'])
 def update_book_route():
@@ -72,10 +76,15 @@ def update_book_route():
     updated_fields = {key: value for key, value in book.items() if key != '_version_'}
     
     update_book(version, updated_fields)
-    return jsonify({"message": f"Book with version {version} updated successfully!"})
+
+    # After update, get the updated book to return it
+    updated_book = get_book_by_version(version)  # Retrieve the updated book
+
+    # Make sure to return the updated book as an object, not as an array
+    return jsonify(updated_book)  # Return the updated book as an object
 
 
-@app.route('/books/<string:version>', methods=['DELETE'])
+@app.route('/books/<int:version>', methods=['DELETE'])
 def delete_book_route(version):
     """Deletes a book by its _version_."""
     # Check if the book exists

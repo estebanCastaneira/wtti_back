@@ -41,11 +41,24 @@ def get_book_by_version(version):
     if conn:
         cursor = conn.cursor()
         cursor.execute(query, (version,))
-        book = cursor.fetchone()
+        row = cursor.fetchone()
         cursor.close()
         conn.close()
+        
+        if row:
+            
+            book = {
+                '_version_': row[0],
+                'title': row[1],
+                'author_name': row[2],
+                'first_publish_year': row[3],
+                'publisher': row[4],
+                'subject': row[5],
+                'stock': row[6],
+            }
     
     return book
+
 
 def update_book(version, updated_fields):
     """
