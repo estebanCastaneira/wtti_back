@@ -2,9 +2,12 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS 
 from app.models import insert_book, get_books, get_book_by_version, update_book, delete_book
 
+
 app = Flask(__name__)
 
 CORS(app)
+
+
 
 @app.route('/books', methods=['GET'])
 def get_books_route():
@@ -24,25 +27,24 @@ def get_books_route():
     
     return jsonify(books_dict)
 
-@app.route('/books/<string:version>', methods=['GET'])
+@app.route('/books/<int:version>', methods=['GET'])
 def get_book_route(version):
     """Retrieve a single book by its _version_."""
-    book = get_book_by_version(version)  # Use the model function to get the book
-    
+
+    book = get_book_by_version(version)         
     if book:
-        # Convert the book to a dictionary and return it as JSON
-        book_dict = {
-            '_version_': book[0],
-            'title': book[1],
-            'author_name': book[2],
-            'first_publish_year': book[3],
-            'publisher': book[4],
-            'subject': book[5],
-            'stock': book[6]
-        }
-        return jsonify(book_dict)
+            book_dict = {
+                '_version_': book['_version_'],
+                'title': book['title'],
+                'author_name': book['author_name'],
+                'first_publish_year': book['first_publish_year'],
+                'publisher': book['publisher'],
+                'subject': book['subject'],
+                'stock': book['stock']
+            }
+            return jsonify(book_dict)
     else:
-        return jsonify({"error": "Book not found"}), 404
+            return jsonify({"error": "Book not found"}), 404
 
 
 @app.route('/books', methods=['POST'])
