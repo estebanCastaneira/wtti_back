@@ -52,6 +52,7 @@ def update_book(version, updated_fields):
     Updates the fields of a book in the database.
     :param version: Identifier of the book.
     :param updated_fields: Dictionary with the fields to update.
+    :return: A dictionary indicating the status of the update.
     """
     set_clause = ", ".join([f"{key} = %s" for key in updated_fields.keys()])
     query = f"UPDATE books SET {set_clause} WHERE _version_ = %s;"
@@ -60,8 +61,16 @@ def update_book(version, updated_fields):
         cursor = conn.cursor()
         cursor.execute(query, (*updated_fields.values(), version))
         conn.commit()
+
+        # Comprobar cuántas filas fueron afectadas
+        rows_updated = cursor.rowcount
+
         cursor.close()
         conn.close()
+
+        # Retornar el número de filas afectadas como confirmación
+        return {"rows_updated": rows_updated}
+    return {"error": "No connection to database"}
 
 def delete_book(version):
     """
