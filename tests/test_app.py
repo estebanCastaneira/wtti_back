@@ -15,7 +15,7 @@ class TestApp(unittest.TestCase):
     def test_insert_book(self):
         """Tests inserting a book into the database."""
         book = {
-            '_version_': '1.0',
+            '_version_': 1.0,
             'title': 'Test Book',
             'author_name': 'Test Author',
             'first_publish_year': 2020,
@@ -37,7 +37,7 @@ class TestApp(unittest.TestCase):
         """Tests retrieving all books from the database."""
         # Insert a book to ensure the database is not empty
         book = {
-            '_version_': '2.0',
+            '_version_': 2.0,
             'title': 'Another Test Book',
             'author_name': 'Another Test Author',
             'first_publish_year': 2021,
@@ -57,7 +57,7 @@ class TestApp(unittest.TestCase):
         """Tests updating a book in the database."""
         # Insert a book to update
         book = {
-            '_version_': '3.0',
+            '_version_': 3.0,
             'title': 'Book to Update',
             'author_name': 'Author to Update',
             'first_publish_year': 2019,
@@ -82,7 +82,7 @@ class TestApp(unittest.TestCase):
         """Tests deleting a book from the database."""
         # Insert a book to delete
         book = {
-            '_version_': '4.0',
+            '_version_': 4.0,
             'title': 'Book to Delete',
             'author_name': 'Author to Delete',
             'first_publish_year': 2018,

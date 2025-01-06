@@ -37,7 +37,7 @@ def create_books_table():
     """
     query = """
     CREATE TABLE IF NOT EXISTS books (
-        _version_ VARCHAR PRIMARY KEY,
+        _version_ INT PRIMARY KEY,
         title VARCHAR NOT NULL,
         author_name VARCHAR NOT NULL,
         first_publish_year INTEGER,
