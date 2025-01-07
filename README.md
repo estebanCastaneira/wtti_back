@@ -195,11 +195,3 @@ Delete a book by its version.
 ### Security
 
 Sensitive information like database credentials is managed through environment variables. The `.env.example` file serves as a template.
-
-### Contributions
-
-Feel free to contribute by submitting issues or pull requests. Ensure your changes are well-tested and documented.
-
-### License
-
-This project is licensed under the MIT License.
